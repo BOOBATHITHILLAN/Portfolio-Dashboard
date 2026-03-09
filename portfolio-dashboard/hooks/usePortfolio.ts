@@ -10,11 +10,12 @@ export function usePortfolio() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cancelledRef = useRef(false);
 
-  const load = useCallback(async (isInitial = false) => {
+  const load = useCallback(async () => {
     try {
-      if (isInitial) setLoading(true);
+      setLoading(true);
       setError(null);
 
       const response = await fetch("/api/stocks");
@@ -35,19 +36,39 @@ export function usePortfolio() {
     }
   }, []);
 
-  useEffect(() => {
-    load(true);
-
-    intervalRef.current = setInterval(() => load(false), REFRESH_INTERVAL);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
+  // Schedule next auto-refresh AFTER current call completes
+  const scheduleNext = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(async () => {
+      await load();
+      if (!cancelledRef.current) scheduleNext();
+    }, REFRESH_INTERVAL);
   }, [load]);
 
-  const refresh = useCallback(() => load(false), [load]);
+  const stopAutoRefresh = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
+  // Initial load + start auto-refresh loop
+  useEffect(() => {
+    cancelledRef.current = false;
+    load().then(() => scheduleNext());
+
+    return () => {
+      cancelledRef.current = true;
+      stopAutoRefresh();
+    };
+  }, [load, scheduleNext, stopAutoRefresh]);
+
+  // Manual refresh: wait for API response, then restart 15s countdown
+  const refresh = useCallback(async () => {
+    stopAutoRefresh();
+    await load();
+    scheduleNext();
+  }, [load, scheduleNext, stopAutoRefresh]);
 
   return { data, loading, error, lastUpdated, refresh };
 }

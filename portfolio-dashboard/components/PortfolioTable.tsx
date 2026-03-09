@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,7 +13,7 @@ import { groupBySector, formatCurrency } from "@/lib/utils";
 
 // ─── Shared Components ───
 
-function GainLossCell({ value }: { value: number }) {
+const GainLossCell = memo(function GainLossCell({ value }: { value: number }) {
   const isGain = value >= 0;
   return (
     <span
@@ -29,9 +29,9 @@ function GainLossCell({ value }: { value: number }) {
       {formatCurrency(value)}
     </span>
   );
-}
+});
 
-function ExchangeBadge({ symbol }: { symbol: string }) {
+const ExchangeBadge = memo(function ExchangeBadge({ symbol }: { symbol: string }) {
   const isNSE = symbol.includes(".NS") || symbol.includes(".NSE");
   const exchange = isNSE
     ? "NSE"
@@ -47,11 +47,11 @@ function ExchangeBadge({ symbol }: { symbol: string }) {
       {exchange}
     </span>
   );
-}
+});
 
 // ─── Mobile Card View ───
 
-function MobileStockCard({ stock }: { stock: StockData }) {
+const MobileStockCard = memo(function MobileStockCard({ stock }: { stock: StockData }) {
   const isGain = stock.gainLoss >= 0;
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-4">
@@ -127,9 +127,9 @@ function MobileStockCard({ stock }: { stock: StockData }) {
       </div>
     </div>
   );
-}
+});
 
-function MobileSectorGroup({ summary }: { summary: SectorSummary }) {
+const MobileSectorGroup = memo(function MobileSectorGroup({ summary }: { summary: SectorSummary }) {
   const isGain = summary.gainLoss >= 0;
   return (
     <div className="mb-5">
@@ -160,9 +160,9 @@ function MobileSectorGroup({ summary }: { summary: SectorSummary }) {
       </div>
     </div>
   );
-}
+});
 
-function MobileView({ data }: { data: StockData[] }) {
+const MobileView = memo(function MobileView({ data }: { data: StockData[] }) {
   const sectors = useMemo(() => groupBySector(data), [data]);
   return (
     <div className="space-y-2">
@@ -171,11 +171,11 @@ function MobileView({ data }: { data: StockData[] }) {
       ))}
     </div>
   );
-}
+});
 
 // ─── Desktop Table View ───
 
-function SectorHeader({ summary }: { summary: SectorSummary }) {
+const SectorHeader = memo(function SectorHeader({ summary }: { summary: SectorSummary }) {
   const isGain = summary.gainLoss >= 0;
   return (
     <tr className="bg-blue-50 border-b-2 border-blue-200">
@@ -205,7 +205,7 @@ function SectorHeader({ summary }: { summary: SectorSummary }) {
       <td colSpan={2} />
     </tr>
   );
-}
+});
 
 const columns: ColumnDef<StockData>[] = [
   {
@@ -318,7 +318,7 @@ const columns: ColumnDef<StockData>[] = [
   },
 ];
 
-function DesktopTable({ data }: { data: StockData[] }) {
+const DesktopTable = memo(function DesktopTable({ data }: { data: StockData[] }) {
   const sectors = useMemo(() => groupBySector(data), [data]);
 
   const totals = useMemo(() => {
@@ -383,7 +383,7 @@ function DesktopTable({ data }: { data: StockData[] }) {
       </table>
     </div>
   );
-}
+});
 
 function SectorGroup({ summary }: { summary: SectorSummary }) {
   const table = useReactTable({
@@ -419,7 +419,7 @@ interface PortfolioTableProps {
   data: StockData[];
 }
 
-export default function PortfolioTable({ data }: PortfolioTableProps) {
+export default memo(function PortfolioTable({ data }: PortfolioTableProps) {
   return (
     <>
       {/* Mobile: cards */}
@@ -432,4 +432,4 @@ export default function PortfolioTable({ data }: PortfolioTableProps) {
       </div>
     </>
   );
-}
+});

@@ -1,12 +1,16 @@
-import yahooFinance from 'yahoo-finance2';
+import yahooFinance from "yahoo-finance2";
 import { fetchGoogleMetrics } from "./scraper";
 import { StockInput } from "../types/stockTypes";
 
 // Initialize yahooFinance instance, handling ESM import behavior where it might be the class
-const yf = typeof yahooFinance === 'function' ? new (yahooFinance as any)() : yahooFinance;
+const yf =
+  typeof yahooFinance === "function"
+    ? new (yahooFinance as any)()
+    : yahooFinance;
+
 /**
  * Fetches live data and calculates financial metrics for a single stock.
- * Handles parallel API requests and provides a fallback on failure. [cite: 79, 86]
+ * Handles parallel API requests and provides a fallback on failure.
  */
 export const getUpdatedStockData = async (stock: StockInput) => {
   try {
