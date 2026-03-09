@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { ApiResponse } from "../types/response.js";
-import { getUpdatedStockData } from "../utils/stock.js";
-import { MOCK_STOCKS } from "../mockdata/mockStocks.js";
+import { ApiResponse } from "../types/response";
+import { getUpdatedStockData } from "../utils/stock";
+import { MOCK_STOCKS } from "../mockdata/mockStocks";
 
 export const getPortfolioData = async (req: Request, res: Response) => {
   try {

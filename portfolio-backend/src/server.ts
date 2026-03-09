@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import portfolioRoutes from "./routes/portfolioRoutes.js";
+import portfolioRoutes from "./routes/portfolioRoutes";
 dotenv.config();
 
 const app = express();

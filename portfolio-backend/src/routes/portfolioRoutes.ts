@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getPortfolioData } from '../controllers/portfolioController.js';
+import { getPortfolioData } from '../controllers/portfolioController';
 
 const router = Router();
 

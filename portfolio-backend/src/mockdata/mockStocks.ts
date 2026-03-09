@@ -1,4 +1,4 @@
-import { StockInput } from "../types/stockTypes.js";
+import { StockInput } from "../types/stockTypes";
 
 export const MOCK_STOCKS: StockInput[] = [
   {

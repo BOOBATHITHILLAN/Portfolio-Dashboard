@@ -9,9 +9,9 @@ export interface StockInput {
 export interface StockData extends StockInput {
   cmp: number;
   peRatio: string;
-  earnings: string;
+  latestEarnings: string;
   investment: number;
   presentValue: number;
   gainLoss: number;
-  portfolioWeight: number;
+  portfolioWeight: string;
 }

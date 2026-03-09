@@ -1,6 +1,6 @@
 import yahooFinance from 'yahoo-finance2';
-import { fetchGoogleMetrics } from "./scraper.js";
-import { StockInput } from "../types/stockTypes.js";
+import { fetchGoogleMetrics } from "./scraper";
+import { StockInput } from "../types/stockTypes";
 
 // Initialize yahooFinance instance, handling ESM import behavior where it might be the class
 const yf = typeof yahooFinance === 'function' ? new (yahooFinance as any)() : yahooFinance;
@@ -15,8 +15,6 @@ export const getUpdatedStockData = async (stock: StockInput) => {
       fetchGoogleMetrics(stock.symbol),
     ]);
 
-    console.log(google);
-
     const cmp = quote?.regularMarketPrice || 0;
     const investment = stock.buyPrice * stock.qty;
     const presentValue = cmp * stock.qty;
@@ -24,8 +22,8 @@ export const getUpdatedStockData = async (stock: StockInput) => {
     return {
       ...stock,
       cmp,
-      peRatio: google.peRatio,
-      latestEarnings: google.earnings,
+      peRatio: google?.peRatio ?? "N/A",
+      latestEarnings: google?.netIncome ?? "N/A",
       investment,
       presentValue,
       gainLoss: presentValue - investment,
