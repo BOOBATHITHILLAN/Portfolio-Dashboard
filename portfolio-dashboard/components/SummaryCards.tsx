@@ -9,7 +9,7 @@ type SummaryCardsProps = {
   data: StockData[];
 };
 
-export default function SummaryCards({ data }: SummaryCardsProps) {
+const SummaryCards = ({ data }: SummaryCardsProps) => {
   const { totalInvestment, totalPresentValue, totalGainLoss, gainLossPercent } =
     useMemo(() => {
       const totalInvestment = data.reduce((sum, s) => sum + s.investment, 0);
@@ -49,4 +49,6 @@ export default function SummaryCards({ data }: SummaryCardsProps) {
       />
     </div>
   );
-}
+};
+
+export default SummaryCards;

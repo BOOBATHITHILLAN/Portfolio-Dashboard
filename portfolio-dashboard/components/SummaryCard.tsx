@@ -11,41 +11,17 @@ type SummaryCardProps = {
   variant?: "gain" | "loss";
 };
 
-export default memo(function SummaryCard({
-  label,
-  value,
-  compactValue,
-  subValue,
-  variant,
-}: SummaryCardProps) {
-  const colorClass =
-    variant === "gain"
-      ? "text-emerald-600"
-      : variant === "loss"
-        ? "text-red-600"
-        : "text-slate-900";
+const SummaryCard = memo(({ label, value, compactValue, subValue, variant }: SummaryCardProps) => {
+  const color = variant === "gain" ? "text-emerald-600" : variant === "loss" ? "text-red-600" : "text-slate-900";
+  const subColor = variant === "gain" ? "text-emerald-500" : variant === "loss" ? "text-red-500" : "text-slate-400";
 
   return (
     <div className="rounded-lg sm:rounded-xl bg-white border border-slate-200 p-2.5 sm:p-4 shadow-sm">
-      <p className="text-[10px] sm:text-xs text-slate-500 font-medium truncate">
-        {label}
-      </p>
-      <p className={`text-sm font-bold mt-0.5 sm:hidden tabular-nums ${colorClass}`}>
-        {compactValue}
-      </p>
-      <p className={`text-xl font-bold mt-1 hidden sm:block tabular-nums ${colorClass}`}>
-        {value}
-      </p>
+      <p className="text-[10px] sm:text-xs text-slate-500 font-medium truncate">{label}</p>
+      <p className={`text-sm font-bold mt-0.5 sm:hidden tabular-nums ${color}`}>{compactValue}</p>
+      <p className={`text-xl font-bold mt-1 hidden sm:block tabular-nums ${color}`}>{value}</p>
       {subValue && (
-        <p
-          className={`text-[10px] sm:text-xs mt-0.5 flex items-center gap-0.5 ${
-            variant === "gain"
-              ? "text-emerald-500"
-              : variant === "loss"
-                ? "text-red-500"
-                : "text-slate-400"
-          }`}
-        >
+        <p className={`text-[10px] sm:text-xs mt-0.5 flex items-center gap-0.5 ${subColor}`}>
           {variant === "gain" && <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
           {variant === "loss" && <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
           {subValue}
@@ -54,3 +30,7 @@ export default memo(function SummaryCard({
     </div>
   );
 });
+
+SummaryCard.displayName = "SummaryCard";
+
+export default SummaryCard;

@@ -3,28 +3,24 @@ import axios from "axios";
 
 const API_BASE = process.env.API_URL || "http://localhost:5000";
 
-// In-memory cache to reduce backend API calls
 let cachedData: unknown = null;
 let cacheTimestamp = 0;
 const CACHE_TTL = 10_000; // 10 seconds
 
-export async function GET() {
+export const GET = async () => {
   try {
     const now = Date.now();
 
-    // Return cached data if still fresh
     if (cachedData && now - cacheTimestamp < CACHE_TTL) {
       return NextResponse.json(cachedData, {
         headers: { "X-Cache": "HIT" },
       });
     }
 
-    // Fetch fresh data from backend
     const { data } = await axios.get(`${API_BASE}/api/portfolio`, {
       timeout: 30000,
     });
 
-    // Update cache
     cachedData = data;
     cacheTimestamp = now;
 
@@ -32,7 +28,6 @@ export async function GET() {
       headers: { "X-Cache": "MISS" },
     });
   } catch (error) {
-    // Return stale cache on error if available
     if (cachedData) {
       return NextResponse.json(cachedData, {
         headers: { "X-Cache": "STALE" },
@@ -46,4 +41,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+};

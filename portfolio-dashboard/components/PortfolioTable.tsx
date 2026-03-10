@@ -11,76 +11,48 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import type { StockData, SectorSummary } from "@/types/Stock";
 import { groupBySector, formatCurrency } from "@/lib/utils";
 
-// ─── Shared Components ───
-
-const GainLossCell = memo(function GainLossCell({ value }: { value: number }) {
+const GainLossCell = ({ value }: { value: number }) => {
   const isGain = value >= 0;
   return (
-    <span
-      className={`inline-flex items-center gap-0.5 text-xs font-semibold ${
-        isGain ? "text-emerald-600" : "text-red-600"
-      }`}
-    >
-      {isGain ? (
-        <ArrowUpRight className="h-3 w-3" />
-      ) : (
-        <ArrowDownRight className="h-3 w-3" />
-      )}
+    <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${isGain ? "text-emerald-600" : "text-red-600"}`}>
+      {isGain ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
       {formatCurrency(value)}
     </span>
   );
-});
+};
 
-const ExchangeBadge = memo(function ExchangeBadge({ symbol }: { symbol: string }) {
+const ExchangeBadge = ({ symbol }: { symbol: string }) => {
   const isNSE = symbol.includes(".NS") || symbol.includes(".NSE");
-  const exchange = isNSE
-    ? "NSE"
-    : symbol.includes(".BO") || symbol.includes(".BSE")
-      ? "BSE"
-      : "---";
+  const exchange = isNSE ? "NSE" : symbol.includes(".BO") || symbol.includes(".BSE") ? "BSE" : "---";
   return (
-    <span
-      className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${
-        isNSE ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"
-      }`}
-    >
+    <span className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-bold ${isNSE ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
       {exchange}
     </span>
   );
-});
+};
 
-// ─── Mobile Card View ───
-
-const MobileStockCard = memo(function MobileStockCard({ stock }: { stock: StockData }) {
+const MobileStockCard = memo(({ stock }: { stock: StockData }) => {
   const isGain = stock.gainLoss >= 0;
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-4">
-      {/* Header row */}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-slate-900 text-sm">
-            {stock.name}
-          </h3>
+          <h3 className="font-semibold text-slate-900 text-sm">{stock.name}</h3>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-slate-500">{stock.symbol}</span>
             <ExchangeBadge symbol={stock.symbol} />
           </div>
         </div>
         <div className="text-right">
-          <div className="text-sm font-bold tabular-nums">
-            {formatCurrency(stock.cmp)}
-          </div>
+          <div className="text-sm font-bold tabular-nums">{formatCurrency(stock.cmp)}</div>
           <div className="text-[10px] text-slate-400 uppercase">CMP</div>
         </div>
       </div>
 
-      {/* Grid of values */}
       <div className="grid grid-cols-3 gap-3 text-xs">
         <div>
           <div className="text-slate-400 mb-0.5">Buy Price</div>
-          <div className="font-medium tabular-nums">
-            {formatCurrency(stock.buyPrice)}
-          </div>
+          <div className="font-medium tabular-nums">{formatCurrency(stock.buyPrice)}</div>
         </div>
         <div>
           <div className="text-slate-400 mb-0.5">Qty</div>
@@ -88,29 +60,19 @@ const MobileStockCard = memo(function MobileStockCard({ stock }: { stock: StockD
         </div>
         <div>
           <div className="text-slate-400 mb-0.5">Wt%</div>
-          <div className="font-medium tabular-nums">
-            {stock.portfolioWeight}%
-          </div>
+          <div className="font-medium tabular-nums">{stock.portfolioWeight}%</div>
         </div>
         <div>
           <div className="text-slate-400 mb-0.5">Investment</div>
-          <div className="font-medium tabular-nums">
-            {formatCurrency(stock.investment)}
-          </div>
+          <div className="font-medium tabular-nums">{formatCurrency(stock.investment)}</div>
         </div>
         <div>
           <div className="text-slate-400 mb-0.5">Present Value</div>
-          <div className="font-medium tabular-nums">
-            {formatCurrency(stock.presentValue)}
-          </div>
+          <div className="font-medium tabular-nums">{formatCurrency(stock.presentValue)}</div>
         </div>
         <div>
           <div className="text-slate-400 mb-0.5">Gain/Loss</div>
-          <div
-            className={`font-semibold tabular-nums ${
-              isGain ? "text-emerald-600" : "text-red-600"
-            }`}
-          >
+          <div className={`font-semibold tabular-nums ${isGain ? "text-emerald-600" : "text-red-600"}`}>
             {formatCurrency(stock.gainLoss)}
           </div>
         </div>
@@ -120,39 +82,30 @@ const MobileStockCard = memo(function MobileStockCard({ stock }: { stock: StockD
         </div>
         <div className="col-span-2">
           <div className="text-slate-400 mb-0.5">Latest Earnings</div>
-          <div className="font-medium tabular-nums">
-            {stock.latestEarnings}
-          </div>
+          <div className="font-medium tabular-nums">{stock.latestEarnings}</div>
         </div>
       </div>
     </div>
   );
 });
 
-const MobileSectorGroup = memo(function MobileSectorGroup({ summary }: { summary: SectorSummary }) {
+MobileStockCard.displayName = "MobileStockCard";
+
+const MobileSectorGroup = ({ summary }: { summary: SectorSummary }) => {
   const isGain = summary.gainLoss >= 0;
   return (
     <div className="mb-5">
-      {/* Sector header */}
       <div className="flex items-center justify-between mb-2 px-1">
-        <h2 className="text-xs font-bold text-blue-900 uppercase tracking-wide">
-          {summary.sector}
-        </h2>
+        <h2 className="text-xs font-bold text-blue-900 uppercase tracking-wide">{summary.sector}</h2>
         <div className="flex items-center gap-3 text-xs">
           <span className="text-slate-500">
             Inv: <span className="font-semibold text-slate-700">{formatCurrency(summary.totalInvestment)}</span>
           </span>
-          <span
-            className={`font-bold ${
-              isGain ? "text-emerald-600" : "text-red-600"
-            }`}
-          >
-            {isGain ? "+" : ""}
-            {formatCurrency(summary.gainLoss)}
+          <span className={`font-bold ${isGain ? "text-emerald-600" : "text-red-600"}`}>
+            {isGain ? "+" : ""}{formatCurrency(summary.gainLoss)}
           </span>
         </div>
       </div>
-      {/* Cards */}
       <div className="space-y-3">
         {summary.stocks.map((stock) => (
           <MobileStockCard key={stock.symbol} stock={stock} />
@@ -160,9 +113,9 @@ const MobileSectorGroup = memo(function MobileSectorGroup({ summary }: { summary
       </div>
     </div>
   );
-});
+};
 
-const MobileView = memo(function MobileView({ data }: { data: StockData[] }) {
+const MobileView = ({ data }: { data: StockData[] }) => {
   const sectors = useMemo(() => groupBySector(data), [data]);
   return (
     <div className="space-y-2">
@@ -171,18 +124,13 @@ const MobileView = memo(function MobileView({ data }: { data: StockData[] }) {
       ))}
     </div>
   );
-});
+};
 
-// ─── Desktop Table View ───
-
-const SectorHeader = memo(function SectorHeader({ summary }: { summary: SectorSummary }) {
+const SectorHeader = ({ summary }: { summary: SectorSummary }) => {
   const isGain = summary.gainLoss >= 0;
   return (
     <tr className="bg-blue-50 border-b-2 border-blue-200">
-      <td
-        colSpan={4}
-        className="px-3 py-2 font-bold text-blue-900 text-xs uppercase tracking-wide"
-      >
+      <td colSpan={4} className="px-3 py-2 font-bold text-blue-900 text-xs uppercase tracking-wide">
         {summary.sector}
       </td>
       <td className="px-2 py-2 text-xs text-blue-700 font-semibold text-right">
@@ -194,18 +142,14 @@ const SectorHeader = memo(function SectorHeader({ summary }: { summary: SectorSu
         {formatCurrency(summary.totalPresentValue)}
       </td>
       <td className="px-2 py-2 text-right">
-        <span
-          className={`text-xs font-bold ${
-            isGain ? "text-emerald-600" : "text-red-600"
-          }`}
-        >
+        <span className={`text-xs font-bold ${isGain ? "text-emerald-600" : "text-red-600"}`}>
           {formatCurrency(summary.gainLoss)}
         </span>
       </td>
       <td colSpan={2} />
     </tr>
   );
-});
+};
 
 const columns: ColumnDef<StockData>[] = [
   {
@@ -214,9 +158,7 @@ const columns: ColumnDef<StockData>[] = [
     size: 140,
     cell: ({ row }) => (
       <div className="min-w-[120px]">
-        <div className="font-medium text-slate-900 text-xs leading-tight">
-          {row.original.name}
-        </div>
+        <div className="font-medium text-slate-900 text-xs leading-tight">{row.original.name}</div>
       </div>
     ),
   },
@@ -224,41 +166,25 @@ const columns: ColumnDef<StockData>[] = [
     accessorKey: "buyPrice",
     header: "Price",
     size: 80,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {formatCurrency(getValue<number>())}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{formatCurrency(getValue<number>())}</div>,
   },
   {
     accessorKey: "qty",
     header: "Qty",
     size: 40,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {getValue<number>()}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{getValue<number>()}</div>,
   },
   {
     accessorKey: "investment",
     header: "Investment",
     size: 90,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {formatCurrency(getValue<number>())}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{formatCurrency(getValue<number>())}</div>,
   },
   {
     accessorKey: "portfolioWeight",
     header: "Wt%",
     size: 50,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {getValue<string>()}%
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{getValue<string>()}%</div>,
   },
   {
     accessorKey: "symbol",
@@ -270,21 +196,13 @@ const columns: ColumnDef<StockData>[] = [
     accessorKey: "cmp",
     header: "CMP",
     size: 80,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs font-semibold tabular-nums">
-        {formatCurrency(getValue<number>())}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs font-semibold tabular-nums">{formatCurrency(getValue<number>())}</div>,
   },
   {
     accessorKey: "presentValue",
     header: "Present Val",
     size: 90,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {formatCurrency(getValue<number>())}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{formatCurrency(getValue<number>())}</div>,
   },
   {
     accessorKey: "gainLoss",
@@ -300,35 +218,23 @@ const columns: ColumnDef<StockData>[] = [
     accessorKey: "peRatio",
     header: "P/E",
     size: 50,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {getValue<string>()}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{getValue<string>()}</div>,
   },
   {
     accessorKey: "latestEarnings",
     header: "Earnings",
     size: 80,
-    cell: ({ getValue }) => (
-      <div className="text-right text-xs tabular-nums">
-        {getValue<string>()}
-      </div>
-    ),
+    cell: ({ getValue }) => <div className="text-right text-xs tabular-nums">{getValue<string>()}</div>,
   },
 ];
 
-const DesktopTable = memo(function DesktopTable({ data }: { data: StockData[] }) {
+const DesktopTable = ({ data }: { data: StockData[] }) => {
   const sectors = useMemo(() => groupBySector(data), [data]);
 
   const totals = useMemo(() => {
     const totalInvestment = data.reduce((sum, s) => sum + s.investment, 0);
     const totalPresentValue = data.reduce((sum, s) => sum + s.presentValue, 0);
-    return {
-      totalInvestment,
-      totalPresentValue,
-      gainLoss: totalPresentValue - totalInvestment,
-    };
+    return { totalInvestment, totalPresentValue, gainLoss: totalPresentValue - totalInvestment };
   }, [data]);
 
   return (
@@ -340,13 +246,9 @@ const DesktopTable = memo(function DesktopTable({ data }: { data: StockData[] })
               <th
                 key={i}
                 style={{ width: col.size }}
-                className={`px-2 py-2.5 font-semibold uppercase tracking-wider ${
-                  i === 0 ? "text-left" : "text-right"
-                }`}
+                className={`px-2 py-2.5 font-semibold uppercase tracking-wider ${i === 0 ? "text-left" : "text-right"}`}
               >
-                {typeof col.header === "function"
-                  ? flexRender(col.header, {} as never)
-                  : (col.header as string)}
+                {typeof col.header === "function" ? flexRender(col.header, {} as never) : (col.header as string)}
               </th>
             ))}
           </tr>
@@ -356,24 +258,14 @@ const DesktopTable = memo(function DesktopTable({ data }: { data: StockData[] })
             <SectorGroup key={sector.sector} summary={sector} />
           ))}
           <tr className="bg-slate-800 text-white font-bold">
-            <td colSpan={3} className="px-3 py-2.5 text-xs">
-              GRAND TOTAL
-            </td>
-            <td className="px-2 py-2.5 text-right text-xs tabular-nums">
-              {formatCurrency(totals.totalInvestment)}
-            </td>
+            <td colSpan={3} className="px-3 py-2.5 text-xs">GRAND TOTAL</td>
+            <td className="px-2 py-2.5 text-right text-xs tabular-nums">{formatCurrency(totals.totalInvestment)}</td>
             <td />
             <td />
             <td />
+            <td className="px-2 py-2.5 text-right text-xs tabular-nums">{formatCurrency(totals.totalPresentValue)}</td>
             <td className="px-2 py-2.5 text-right text-xs tabular-nums">
-              {formatCurrency(totals.totalPresentValue)}
-            </td>
-            <td className="px-2 py-2.5 text-right text-xs tabular-nums">
-              <span
-                className={
-                  totals.gainLoss >= 0 ? "text-emerald-400" : "text-red-400"
-                }
-              >
+              <span className={totals.gainLoss >= 0 ? "text-emerald-400" : "text-red-400"}>
                 {formatCurrency(totals.gainLoss)}
               </span>
             </td>
@@ -383,9 +275,9 @@ const DesktopTable = memo(function DesktopTable({ data }: { data: StockData[] })
       </table>
     </div>
   );
-});
+};
 
-function SectorGroup({ summary }: { summary: SectorSummary }) {
+const SectorGroup = ({ summary }: { summary: SectorSummary }) => {
   const table = useReactTable({
     data: summary.stocks,
     columns,
@@ -398,9 +290,7 @@ function SectorGroup({ summary }: { summary: SectorSummary }) {
       {table.getRowModel().rows.map((row, i) => (
         <tr
           key={row.id}
-          className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${
-            i % 2 === 1 ? "bg-slate-25" : ""
-          }`}
+          className={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${i % 2 === 1 ? "bg-slate-25" : ""}`}
         >
           {row.getVisibleCells().map((cell) => (
             <td key={cell.id} className="px-2 py-2">
@@ -411,25 +301,21 @@ function SectorGroup({ summary }: { summary: SectorSummary }) {
       ))}
     </>
   );
-}
+};
 
-// ─── Main Component ───
-
-interface PortfolioTableProps {
+type PortfolioTableProps = {
   data: StockData[];
-}
+};
 
-export default memo(function PortfolioTable({ data }: PortfolioTableProps) {
-  return (
-    <>
-      {/* Mobile: cards */}
-      <div className="block lg:hidden">
-        <MobileView data={data} />
-      </div>
-      {/* Desktop: table */}
-      <div className="hidden lg:block">
-        <DesktopTable data={data} />
-      </div>
-    </>
-  );
-});
+const PortfolioTable = ({ data }: PortfolioTableProps) => (
+  <>
+    <div className="block lg:hidden">
+      <MobileView data={data} />
+    </div>
+    <div className="hidden lg:block">
+      <DesktopTable data={data} />
+    </div>
+  </>
+);
+
+export default PortfolioTable;

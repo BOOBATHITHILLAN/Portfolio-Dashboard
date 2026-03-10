@@ -5,7 +5,7 @@ import type { StockData, PortfolioResponse } from "@/types/Stock";
 
 const REFRESH_INTERVAL = 15_000; // 15 seconds
 
-export function usePortfolio() {
+export const usePortfolio = () => {
   const [data, setData] = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,7 @@ export function usePortfolio() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cancelledRef = useRef(false);
 
-  const load = useCallback(async () => {
+  const fetchPortfolio = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -36,14 +36,13 @@ export function usePortfolio() {
     }
   }, []);
 
-  // Schedule next auto-refresh AFTER current call completes
   const scheduleNext = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(async () => {
-      await load();
+      await fetchPortfolio();
       if (!cancelledRef.current) scheduleNext();
     }, REFRESH_INTERVAL);
-  }, [load]);
+  }, [fetchPortfolio]);
 
   const stopAutoRefresh = useCallback(() => {
     if (timeoutRef.current) {
@@ -52,23 +51,21 @@ export function usePortfolio() {
     }
   }, []);
 
-  // Initial load + start auto-refresh loop
   useEffect(() => {
     cancelledRef.current = false;
-    load().then(() => scheduleNext());
+    fetchPortfolio().then(() => scheduleNext());
 
     return () => {
       cancelledRef.current = true;
       stopAutoRefresh();
     };
-  }, [load, scheduleNext, stopAutoRefresh]);
+  }, [fetchPortfolio, scheduleNext, stopAutoRefresh]);
 
-  // Manual refresh: wait for API response, then restart 15s countdown
   const refresh = useCallback(async () => {
     stopAutoRefresh();
-    await load();
+    await fetchPortfolio();
     scheduleNext();
-  }, [load, scheduleNext, stopAutoRefresh]);
+  }, [fetchPortfolio, scheduleNext, stopAutoRefresh]);
 
   return { data, loading, error, lastUpdated, refresh };
-}
+};

@@ -1,63 +1,77 @@
 import type { StockData, SectorSummary } from "@/types/Stock";
 
-export function groupBySector(stocks: StockData[]): SectorSummary[] {
-  const sectorMap = new Map<string, StockData[]>();
+const buildSectorSummary = (sector: string, stocks: StockData[]): SectorSummary => {
+  const totalInvestment = stocks.reduce((sum, s) => sum + s.investment, 0);
+  const totalPresentValue = stocks.reduce((sum, s) => sum + s.presentValue, 0);
+
+  return {
+    sector,
+    totalInvestment,
+    totalPresentValue,
+    gainLoss: totalPresentValue - totalInvestment,
+    stocks,
+  };
+};
+
+export const groupBySector = (stocks: StockData[]): SectorSummary[] => {
+  const grouped: Record<string, StockData[]> = {};
 
   for (const stock of stocks) {
     const sector = stock.sector || "Other";
-    if (!sectorMap.has(sector)) {
-      sectorMap.set(sector, []);
+    if (!grouped[sector]) {
+      grouped[sector] = [];
     }
-    sectorMap.get(sector)!.push(stock);
+    grouped[sector].push(stock);
   }
 
-  return Array.from(sectorMap.entries()).map(([sector, sectorStocks]) => {
-    const totalInvestment = sectorStocks.reduce(
-      (sum, s) => sum + s.investment,
-      0
-    );
-    const totalPresentValue = sectorStocks.reduce(
-      (sum, s) => sum + s.presentValue,
-      0
-    );
+  return Object.entries(grouped).map(([sector, sectorStocks]) =>
+    buildSectorSummary(sector, sectorStocks)
+  );
+};
 
-    return {
-      sector,
-      totalInvestment,
-      totalPresentValue,
-      gainLoss: totalPresentValue - totalInvestment,
-      stocks: sectorStocks,
-    };
-  });
-}
+const toIndianFormat = (num: number): string => {
+  const [whole, decimal] = num.toFixed(2).split(".");
+  const isNegative = whole.startsWith("-");
+  const digits = isNegative ? whole.slice(1) : whole;
 
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
+  let result = "";
+  const len = digits.length;
 
-export function formatNumber(value: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
-export function formatCompactCurrency(value: number): string {
-  const abs = Math.abs(value);
-  const sign = value < 0 ? "-" : "";
-  if (abs >= 1_00_00_000) {
-    return `${sign}₹${(abs / 1_00_00_000).toFixed(2)}Cr`;
+  for (let i = 0; i < len; i++) {
+    const pos = len - i;
+    if (i > 0 && pos === 3) result += ",";
+    if (i > 0 && pos > 3 && pos % 2 === 1) result += ",";
+    result += digits[i];
   }
-  if (abs >= 1_00_000) {
-    return `${sign}₹${(abs / 1_00_000).toFixed(2)}L`;
+
+  return `${isNegative ? "-" : ""}${result}.${decimal}`;
+};
+
+export const formatCurrency = (value: number): string => {
+  return `₹${toIndianFormat(value)}`;
+};
+
+export const formatNumber = (value: number): string => {
+  return toIndianFormat(value);
+};
+
+export const formatCompactCurrency = (value: number): string => {
+  let abs = value;
+  let sign = "";
+
+  if (value < 0) {
+    abs = value * -1;
+    sign = "-";
   }
-  if (abs >= 1_000) {
-    return `${sign}₹${(abs / 1_000).toFixed(1)}K`;
+
+  if (abs >= 10000000) {
+    return sign + "₹" + (abs / 10000000).toFixed(2) + "Cr";
   }
-  return `${sign}₹${abs.toFixed(0)}`;
-}
+  if (abs >= 100000) {
+    return sign + "₹" + (abs / 100000).toFixed(2) + "L";
+  }
+  if (abs >= 1000) {
+    return sign + "₹" + (abs / 1000).toFixed(1) + "K";
+  }
+  return sign + "₹" + abs.toFixed(0);
+};

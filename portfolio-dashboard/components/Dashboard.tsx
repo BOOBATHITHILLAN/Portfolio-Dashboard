@@ -7,7 +7,7 @@ import LoadingState from "@/components/LoadingState";
 import PortfolioTable from "@/components/PortfolioTable";
 import { usePortfolio } from "@/hooks/usePortfolio";
 
-export default function Dashboard() {
+const Dashboard = () => {
   const { data, loading, error, lastUpdated, refresh } = usePortfolio();
 
   return (
@@ -38,4 +38,6 @@ export default function Dashboard() {
       </main>
     </>
   );
-}
+};
+
+export default Dashboard;
